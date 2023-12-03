@@ -161,6 +161,7 @@ def view_pca(data_dict):
     pca_df1, var_df1 = apply_pca(data_dict['concrete'])
     pca_df2, var_df2 = apply_pca(data_dict['energy'])
     pca_df3, var_df3 = apply_pca(data_dict['power'])
+    pca_df4, var_df4 = apply_pca(data_dict['bank'])
 
     fig = plt.figure(figsize=(20, 12))
     ax1 = fig.add_subplot(121, projection='3d')
@@ -169,17 +170,20 @@ def view_pca(data_dict):
     ax1.scatter(pca_df1[:, 1], pca_df1[:, 0], pca_df1[:, 2], color = 'green', label=f'Concrete: ({100*sum(var_df1):.0f}%)')
     ax1.scatter(pca_df2[:, 1], pca_df2[:, 0], pca_df2[:, 2], color = 'gray', label=f'Energy:   ({100*sum(var_df2):.0f}%)')
     ax1.scatter(pca_df3[:, 1], pca_df3[:, 0], pca_df3[:, 2], color = 'red', label=f'Power:    ({100*sum(var_df3):.0f}%)')
+    ax1.scatter(pca_df4[:, 1], pca_df4[:, 0], pca_df4[:, 2], color = 'yellow',label = f'Energy:    ({100 * sum(var_df4):.0f}%)')
 
     ax1.set_xlabel('PC1')
     ax1.set_ylabel('PC2')
     ax1.set_zlabel('PC3')
     ax1.legend()
+    plt.title('PCA Results')
 
     ax2 = fig.add_subplot(122, projection='3d')
 
     ax2.scatter(pca_df1[:, 1], pca_df1[:, 0], pca_df1[:, 2], color = 'green', label=f'Concrete: ({100*sum(var_df1):.0f}%)')
     ax2.scatter(pca_df2[:, 1], pca_df2[:, 0], pca_df2[:, 2], color = 'gray', label=f'Energy:   ({100*sum(var_df2):.0f}%)')
     ax2.scatter(pca_df3[:, 1], pca_df3[:, 0], pca_df3[:, 2], color = 'red', label=f'Power:    ({100*sum(var_df3):.0f}%)')
+    ax2.scatter(pca_df4[:, 1], pca_df4[:, 0], pca_df4[:, 2], color = 'yellow', label = f'Energy:    ({100 * sum(var_df4):.0f}%)')
     ax2.view_init(elev=25, azim=185)
 
     ax2.set_xlabel('PC1')
@@ -187,7 +191,7 @@ def view_pca(data_dict):
     ax2.set_zlabel('PC3')
     ax2.legend()
 
-    plt.title('PCA Results of Three Dataframes')
+    plt.title('PCA Results')
     plt.show()
 
 def plot_learning(dict_metadata, seed, data, exist_val):

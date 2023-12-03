@@ -24,7 +24,7 @@ class Experiment_Predict():
         self.method_input = ['gnn_mdi', 'knn'] if input_list is None else input_list
         self.exist_val_percent = [0.30, 0.50, 0.70, 0.90] if value_list is None else value_list
 
-        self.target_var = {'concrete': 'compr_strength', 'energy': 'Y2', 'power': 'PE'}
+        self.target_var = {'concrete': 'compr_strength', 'energy': 'Y2', 'power': 'PE', 'bank' : 'Devedor_cartao'}
 
         self.algotithm_baseline = [LinearRegression(fit_intercept = False),
                                    ElasticNetCV(cv = 10, random_state = 12),
@@ -101,67 +101,80 @@ class Experiment_Predict():
                        'Explained variance'])
 
         for i, alg in enumerate(algorithms):
-            model_poly = Pipeline([('poly', PolynomialFeatures(degree = 3, interaction_only = True)),
-                                   ('linear', LinearRegression(fit_intercept = False))])
+            if data == 'bank' and ((str(alg) == 'PolynomialFeatures()') or (str(alg) == 'Lasso()')):
+                estimador = LinearRegression(fit_intercept = False).fit(x_treino, y_treino)
+                y_pred = estimador.predict(x_teste)
 
-            if str(alg) == 'GRAPE_y':
-                y_tes = self.data_dict[data + 'scaler'].transform(y_teste.reshape(-1, 1))
-                y_trei = self.data_dict[data + 'scaler'].transform(y_treino.reshape(-1, 1))
-                df_result.loc[str(alg)] = [seed, data, data_id, exist_val, 'Grape_y',
-                                           mean_squared_error(y_true = y_tes, y_pred = y_trei),
-                                           mean_absolute_error(y_true = y_tes, y_pred = y_trei),
-                                           max_error(y_true = y_tes, y_pred = y_trei),
-                                           explained_variance_score(y_true = y_tes, y_pred = y_trei),
+                df_result.loc[str(alg)] = [seed, data, data_id, exist_val, algotithm_label[i],
+                                           mean_squared_error(y_true = y_teste, y_pred = y_pred),
+                                           mean_absolute_error(y_true = y_teste, y_pred = y_pred),
+                                           max_error(y_true = y_teste, y_pred = y_pred),
+                                           explained_variance_score(y_true = y_teste, y_pred = y_pred),
                                            ]
-                # model_dict[str(alg)] = {'estimador' : 'grape_gnn', 'y_pred' : y_treino}
-                return df_result
-
-            elif str(alg) == "PolynomialFeatures()":
-                estimador = model_poly.fit(x_treino, y_treino)
-                y_pred = estimador.predict(x_teste)
-
-            elif str(alg) == "Lasso()":
-
-                X_tr_poly = model_poly.fit(x_treino, y_treino).named_steps['poly'].transform(x_treino)
-                model_lassocv = make_pipeline(LassoCV(cv = 10, max_iter = 10000, tol = 1e-3)).fit(X_tr_poly,
-                                                                                                  y_treino)
-
-                lasso = model_lassocv[-1]
-                alpha_CV = lasso.alpha_
-
-                if plot_lasso:
-                    plt.subplots(1, 1, figsize = (10, 6))
-                    plt.semilogx(lasso.alphas_, lasso.mse_path_, linestyle = ":")
-                    plt.plot(
-                        lasso.alphas_,
-                        lasso.mse_path_.mean(axis = -1),
-                        color = "black",
-                        label = "Average across the folds",
-                        linewidth = 2)
-                    plt.axvline(lasso.alpha_, linestyle = "--", color = "black",
-                                label = f"alpha: CV estimate = {lasso.alpha_:.2e}")
-
-                    plt.xlabel(r"$\alpha$")
-                    plt.ylabel("Mean square error")
-                    plt.legend()
-                    plt.title(f"Mean square error on each fold  - LassoCV")
-                    plt.show()
-
-                model_lasso = Pipeline(steps = [('Lasso', Lasso(alpha = 1e-4, max_iter = 10000, tol = 1e-3))])
-
-                x_teste_lasso = model_poly.named_steps['poly'].transform(x_teste)
-                estimador = model_lasso.fit(X_tr_poly, y_treino)
-                y_pred = estimador.predict(x_teste_lasso)
             else:
-                estimador = alg.fit(x_treino, y_treino)
-                y_pred = estimador.predict(x_teste)
 
-            df_result.loc[str(alg)] = [seed, data, data_id, exist_val, algotithm_label[i],
-                                       mean_squared_error(y_true = y_teste, y_pred = y_pred),
-                                       mean_absolute_error(y_true = y_teste, y_pred = y_pred),
-                                       max_error(y_true = y_teste, y_pred = y_pred),
-                                       explained_variance_score(y_true = y_teste, y_pred = y_pred),
-                                       ]
+                model_poly = Pipeline([('poly', PolynomialFeatures(degree = 3, interaction_only = True)),
+                                       ('linear', LinearRegression(fit_intercept = False))
+                                       ])
+
+                if str(alg) == 'GRAPE_y':
+                    y_tes = self.data_dict[data + 'scaler'].transform(y_teste.reshape(-1, 1))
+                    y_trei = self.data_dict[data + 'scaler'].transform(y_treino.reshape(-1, 1))
+                    df_result.loc[str(alg)] = [seed, data, data_id, exist_val, 'Grape_y',
+                                               mean_squared_error(y_true = y_tes, y_pred = y_trei),
+                                               mean_absolute_error(y_true = y_tes, y_pred = y_trei),
+                                               max_error(y_true = y_tes, y_pred = y_trei),
+                                               explained_variance_score(y_true = y_tes, y_pred = y_trei),
+                                               ]
+                    # model_dict[str(alg)] = {'estimador' : 'grape_gnn', 'y_pred' : y_treino}
+                    return df_result
+
+                elif str(alg) == "PolynomialFeatures()":
+                    estimador = model_poly.fit(x_treino, y_treino)
+                    y_pred = estimador.predict(x_teste)
+
+                elif str(alg) == "Lasso()":
+
+                    X_tr_poly = model_poly.fit(x_treino, y_treino).named_steps['poly'].transform(x_treino)
+                    model_lassocv = make_pipeline(LassoCV(cv = 10, max_iter = 10000, tol = 1e-3)).fit(X_tr_poly,
+                                                                                                      y_treino)
+
+                    lasso = model_lassocv[-1]
+                    alpha_CV = lasso.alpha_
+
+                    if plot_lasso:
+                        plt.subplots(1, 1, figsize = (10, 6))
+                        plt.semilogx(lasso.alphas_, lasso.mse_path_, linestyle = ":")
+                        plt.plot(
+                            lasso.alphas_,
+                            lasso.mse_path_.mean(axis = -1),
+                            color = "black",
+                            label = "Average across the folds",
+                            linewidth = 2)
+                        plt.axvline(lasso.alpha_, linestyle = "--", color = "black",
+                                    label = f"alpha: CV estimate = {lasso.alpha_:.2e}")
+
+                        plt.xlabel(r"$\alpha$")
+                        plt.ylabel("Mean square error")
+                        plt.legend()
+                        plt.title(f"Mean square error on each fold  - LassoCV")
+                        plt.show()
+
+                    model_lasso = Pipeline(steps = [('Lasso', Lasso(alpha = 1e-4, max_iter = 10000, tol = 1e-3))])
+
+                    x_teste_lasso = model_poly.named_steps['poly'].transform(x_teste)
+                    estimador = model_lasso.fit(X_tr_poly, y_treino)
+                    y_pred = estimador.predict(x_teste_lasso)
+                else:
+                    estimador = alg.fit(x_treino, y_treino)
+                    y_pred = estimador.predict(x_teste)
+
+                df_result.loc[str(alg)] = [seed, data, data_id, exist_val, algotithm_label[i],
+                                           mean_squared_error(y_true = y_teste, y_pred = y_pred),
+                                           mean_absolute_error(y_true = y_teste, y_pred = y_pred),
+                                           max_error(y_true = y_teste, y_pred = y_pred),
+                                           explained_variance_score(y_true = y_teste, y_pred = y_pred),
+                                           ]
         return df_result
 
     def compile_predict(self):

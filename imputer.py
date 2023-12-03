@@ -128,7 +128,7 @@ class Experiment_Input():
         plt.xticks(fontsize = 10)
 
         x_min = 0.03
-        x_max = 0.30
+        x_max = 1 / len(self.data_base) - x_min
         for data in self.data_base:
             df_metric = self.df_error[
                 (self.df_error['miss_val'] == exist_val_percent) & (self.df_error['data'] == data)]
@@ -138,8 +138,8 @@ class Experiment_Input():
             plt.axhline(xmin = x_min - 0.03, xmax = x_max + 0.03, y = min_rmse, lw = 4, color = 'white')
             plt.axhline(xmin = x_min, xmax = x_max, y = scnd_rmse, linestyle = '--', lw = 2, color = 'red')
             plt.axhline(xmin = x_min, xmax = x_max, y = grape_rmse, linestyle = '--', lw = 2, color = 'blue')
-            x_min += 1 / 3
-            x_max += 1 / 3
+            x_min += 1 / len(self.data_base)
+            x_max += 1 / len(self.data_base)
 
         plt.axhline(xmin = 0, xmax = 0, y = 0, lw = 4, color = 'white', label = metric + ' Mínimo')
         plt.axhline(xmin = 0, xmax = 0, y = 0, linestyle = '--', lw = 2, color = 'red', label = metric + ' Baseline')
