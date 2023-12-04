@@ -270,7 +270,7 @@ class Experiment_Predict():
         # ax.legend()
         ax.invert_xaxis()
         ax.set_title(metric + f" - {data.capitalize()}")
-
+        ax.set_box_aspect([3, 1, 1])
         plt.show()
 
     def plot_predict_bars(self, data, exist_val, metric):
@@ -281,10 +281,12 @@ class Experiment_Predict():
         palette = sns.color_palette("Set2", n_colors = 12)
         figure, ax = plt.subplots(1, 1, figsize = (15, 6))
 
-        sns.barplot(data = df_pred[df_pred['exist_val'] == 1], x = 'input_alg', y = metric, ax = ax,
-                    color = palette[0])
         sns.barplot(data = df_err[df_err['regression_alg'] == 'Grape_y'], x = 'input_alg', y = metric, ax = ax,
-                    color = palette[-1])
+                    color = palette[0])
+
+        sns.barplot(data = df_pred[df_pred['exist_val'] == 1], x = 'input_alg', y = metric,
+                    hue = 'regression_alg', ax = ax, palette = palette[2:-1])
+
 
         sns.barplot(data = df_err[df_err['regression_alg'] != 'Grape_y'], x = 'input_alg', y = metric,
                     hue = 'regression_alg', ax = ax, palette = palette[2:-1])

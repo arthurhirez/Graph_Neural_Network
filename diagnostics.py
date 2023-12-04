@@ -152,11 +152,14 @@ class EarlyStop:
 
 
 def view_pca(data_dict):
+    from sklearn.preprocessing import StandardScaler
     def apply_pca(data):
+        scaler = StandardScaler()
         df = data.iloc[:,:-1]
+        df_scaled = scaler.fit_transform(df)
         pca = PCA(n_components=3)
-        pca_result = pca.fit(df)
-        return pca_result.transform(df), pca_result.explained_variance_
+        pca_result = pca.fit(df_scaled)
+        return pca_result.transform(df_scaled), pca_result.explained_variance_ratio_
 
     pca_df1, var_df1 = apply_pca(data_dict['concrete'])
     pca_df2, var_df2 = apply_pca(data_dict['energy'])
@@ -167,10 +170,10 @@ def view_pca(data_dict):
     ax1 = fig.add_subplot(121, projection='3d')
 
 
-    ax1.scatter(pca_df1[:, 1], pca_df1[:, 0], pca_df1[:, 2], color = 'green', label=f'Concrete: ({100*sum(var_df1):.0f}%)')
-    ax1.scatter(pca_df2[:, 1], pca_df2[:, 0], pca_df2[:, 2], color = 'gray', label=f'Energy:   ({100*sum(var_df2):.0f}%)')
-    ax1.scatter(pca_df3[:, 1], pca_df3[:, 0], pca_df3[:, 2], color = 'red', label=f'Power:    ({100*sum(var_df3):.0f}%)')
-    ax1.scatter(pca_df4[:, 1], pca_df4[:, 0], pca_df4[:, 2], color = 'yellow',label = f'Energy:    ({100 * sum(var_df4):.0f}%)')
+    ax1.scatter(pca_df1[:, 1], pca_df1[:, 0], pca_df1[:, 2], color = 'green', label=f'Concrete: ({100*sum(var_df1[0:3]):.0f}%)')
+    ax1.scatter(pca_df2[:, 1], pca_df2[:, 0], pca_df2[:, 2], color = 'gray', label=f'Energy:   ({100*sum(var_df2[0:3]):.0f}%)')
+    ax1.scatter(pca_df3[:, 1], pca_df3[:, 0], pca_df3[:, 2], color = 'red', label=f'Power:    ({100*sum(var_df3[0:3]):.0f}%)')
+    ax1.scatter(pca_df4[:, 1], pca_df4[:, 0], pca_df4[:, 2], color = 'yellow',label = f'Bank:    ({100 * sum(var_df4[0:3]):.0f}%)')
 
     ax1.set_xlabel('PC1')
     ax1.set_ylabel('PC2')
@@ -183,8 +186,8 @@ def view_pca(data_dict):
     ax2.scatter(pca_df1[:, 1], pca_df1[:, 0], pca_df1[:, 2], color = 'green', label=f'Concrete: ({100*sum(var_df1):.0f}%)')
     ax2.scatter(pca_df2[:, 1], pca_df2[:, 0], pca_df2[:, 2], color = 'gray', label=f'Energy:   ({100*sum(var_df2):.0f}%)')
     ax2.scatter(pca_df3[:, 1], pca_df3[:, 0], pca_df3[:, 2], color = 'red', label=f'Power:    ({100*sum(var_df3):.0f}%)')
-    ax2.scatter(pca_df4[:, 1], pca_df4[:, 0], pca_df4[:, 2], color = 'yellow', label = f'Energy:    ({100 * sum(var_df4):.0f}%)')
-    ax2.view_init(elev=25, azim=185)
+    ax2.scatter(pca_df4[:, 1], pca_df4[:, 0], pca_df4[:, 2], color = 'yellow', label = f'Bank:    ({100 * sum(var_df4):.0f}%)')
+    ax2.view_init(elev=25, azim=45)
 
     ax2.set_xlabel('PC1')
     ax2.set_ylabel('PC2')
