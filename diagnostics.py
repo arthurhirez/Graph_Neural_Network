@@ -125,7 +125,7 @@ class EarlyStop:
     def should_stop(self):
         return self.stop
 
-    # TODO: implement EarlyStop -> didn't reach stop criteria on the current project
+    # TODO: integrate EarlyStop on GRAPE code -> didn't reach stop criteria on the current project
     # delta = np.e-3
     # early_rmse = EarlyStop(patience = 3, delta = delta, mode = 'min')
     # early_l1 = EarlyStop(patience = 3, delta = delta, mode = 'min')
