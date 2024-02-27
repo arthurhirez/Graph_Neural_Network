@@ -1,4 +1,6 @@
-reference GNN: https://snap.stanford.edu/grape/
+This repository contains the results of a study that utilized the Graph Neural Network (GNN) GRAPE, developed by researchers from Stanford. It presents a superficial analysis of the GNN hyperparameters, followed by the main study. In the first part of this study, GNN is compared with other algorithms for imputing missing data. In the second part of the study, the goal is to observe the performance of GNN against various other algorithms for the classification task, using the imputed data from the first stage of the study as a basis.
+
+**reference GNN:** https://snap.stanford.edu/grape/
 
 # Initial Study on GNN - Hyperparameters and Convergence
 
